@@ -21,6 +21,18 @@ app.get('/', (req, res) => {
 
 
 //Aniko-------------------------------------------------
+app.delete('/jatekTorles/:jatek_id', (req, res) => {
+        const {jatek_id} =req.params
+        const sql=`delete from jatek where jatek_id=?`
+        pool.query(sql,[jatek_id], (err, result) => {
+        if (err) {
+            console.log(err)
+            return res.status(500).json({error:"Hiba"})
+        }
+       
+        return res.status(200).json({message:"Sikeres törlés"})
+        })
+})
 
 
 
