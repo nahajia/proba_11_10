@@ -47,6 +47,12 @@ app.get('/h2', (req, res) => {
 })
 
 
+app.get('/h2', (req, res) => {
+  res.send('Hello World2g!')
+})
+
+
+
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
