@@ -28,7 +28,7 @@ function App() {
   };
 
   const updateGame = async () => {
-    await axios.put(API + "/jatekModositas/" + editId, form);
+    await axios.put(API + "/jatekModositas1/" + editId, form);
     setForm({ nev: "", kategoria: "", ar: "" });
     setEditId(null);
     loadData();
