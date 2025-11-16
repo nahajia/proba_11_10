@@ -40,7 +40,7 @@ app.delete('/jatekTorles/:jatek_id', (req, res) => {
 
 //Nandi-----------------------------------------------
 
-app.get('/h1', (req, res) => {
+app.get('/alma', (req, res) => {
   res.send('Hello World1!')
 })
 
