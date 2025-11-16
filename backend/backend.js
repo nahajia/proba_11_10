@@ -1,6 +1,7 @@
 const express = require('express')
 const mysql = require('mysql')
 const cors = require('cors')
+const { todo } = require('node:test')
 const app = express()
 const port = 3000
 
@@ -39,11 +40,16 @@ app.delete('/jatekTorles/:jatek_id', (req, res) => {
 
 //Nandi-----------------------------------------------
 
+app.get('/h1', (req, res) => {
+  res.send('Hello World1!')
+})
 
+app.get('/h2', (req, res) => {
+  res.send('Hello World2g!')
+})
 
 
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
-
