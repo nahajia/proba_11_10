@@ -1,95 +1,91 @@
 const express = require('express');
-const mysql = require('mysql');
 const cors = require('cors');
-const { v4: uuidv4 } = require('uuid');   // ← NEW LIBRARY
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
-const port = 2222;
+const port = 5000;
 
 app.use(cors());
 app.use(express.json());
 
-// static folders
-app.use("/kepek", express.static("kepek"));
-app.use("/kepek2", express.static("kepek2"));
+// In-memory "database"
+let jatekok = [];
 
-// MySQL pool
-const pool = mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'jatek2025'
+// --------------------
+// GET ALL GAMES
+// --------------------
+app.get('/osszesJatek', (req, res) => {
+    res.json(jatekok);
 });
 
-// ----------------------------------------------------
-// GET example
-// ----------------------------------------------------
-app.get('/', (req, res) => {
-    res.send('Hello World!');
-});
-
-// ----------------------------------------------------
-// DELETE (already existed)
-// ----------------------------------------------------
-app.delete('/jatekTorles/:jatek_id', (req, res) => {
-    const { jatek_id } = req.params;
-    const sql = `DELETE FROM jatek WHERE jatek_id=?`;
-
-    pool.query(sql, [jatek_id], (err) => {
-        if (err) return res.status(500).json({ error: "Hiba történt" });
-        return res.status(200).json({ message: "Sikeres törlés" });
-    });
-});
-
-// ----------------------------------------------------
-// POST – new jatek INSERT
-// ----------------------------------------------------
+// --------------------
+// ADD GAME (POST)
+// --------------------
 app.post('/jatekFelvetel', (req, res) => {
     const { nev, kategoria, ar } = req.body;
 
-    // using uuid for safer ID generation
-    const id = uuidv4();
+    const ujJatek = {
+        jatek_id: uuidv4(),
+        nev,
+        kategoria,
+        ar
+    };
 
-    const sql = `INSERT INTO jatek (jatek_id, nev, kategoria, ar) VALUES (?, ?, ?, ?)`;
+    jatekok.push(ujJatek);
 
-    pool.query(sql, [id, nev, kategoria, ar], (err) => {
-        if (err) return res.status(500).json({ error: "Hiba a feltöltés során" });
-
-        return res.status(201).json({
-            message: "Sikeres felvétel",
-            inserted_id: id
-        });
+    res.status(201).json({
+        message: "Játék hozzáadva",
+        jatek: ujJatek
     });
 });
 
-// ----------------------------------------------------
-// PUT – update jatek
-// ----------------------------------------------------
+// --------------------
+// UPDATE GAME (PUT)
+// --------------------
 app.put('/jatekModositas/:jatek_id', (req, res) => {
     const { jatek_id } = req.params;
     const { nev, kategoria, ar } = req.body;
 
-    const sql = `
-        UPDATE jatek 
-        SET nev=?, kategoria=?, ar=? 
-        WHERE jatek_id=?`;
+    const index = jatekok.findIndex(j => j.jatek_id === jatek_id);
 
-    pool.query(sql, [nev, kategoria, ar, jatek_id], (err, result) => {
-        if (err) return res.status(500).json({ error: "Hiba módosításkor" });
+    if (index === -1) {
+        return res.status(404).json({ error: "Nincs ilyen játék" });
+    }
 
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: "Nincs ilyen játék" });
-        }
+    jatekok[index] = {
+        ...jatekok[index],
+        nev,
+        kategoria,
+        ar
+    };
 
-        return res.status(200).json({ message: "Sikeres módosítás" });
-    });
+    res.json({ message: "Sikeres módosítás", jatek: jatekok[index] });
 });
 
-// Simple test routes
-app.get('/h1', (req, res) => res.send("Hello World2g!"));
-app.get('/h2', (req, res) => res.send("Hello World2g!"));
+// --------------------
+// DELETE GAME
+// --------------------
+app.delete('/jatekTorles/:jatek_id', (req, res) => {
+    const { jatek_id } = req.params;
 
-// Server
+    const before = jatekok.length;
+    jatekok = jatekok.filter(j => j.jatek_id !== jatek_id);
+
+    if (jatekok.length === before) {
+        return res.status(404).json({ error: "Nincs ilyen játék" });
+    }
+
+    res.json({ message: "Játék törölve" });
+});
+
+// --------------------
+// Simple test routes
+// --------------------
+app.get('/', (req, res) => {
+    res.send("Server running without database!");
+});
+
+// Start server
 app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+    console.log(`Backend running on port ${port}`);
 });
