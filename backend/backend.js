@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
 
 //Nandi-----------------------------------------------
 
-app.get('/h1', (req, res) => {
+app.get('/h2', (req, res) => {
   res.send('Hello World1!')
 })
 
