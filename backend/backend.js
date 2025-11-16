@@ -41,10 +41,15 @@ app.delete('/jatekTorles/:jatek_id', (req, res) => {
 //Nandi-----------------------------------------------
 
 
+app.get('/h2', (req, res) => {
+  res.send('Hello World2g!')
+})
+
 
 app.get('/h2', (req, res) => {
   res.send('Hello World2g!')
 })
+
 
 
 
